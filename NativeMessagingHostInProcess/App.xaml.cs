@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.AppService;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -14,6 +18,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Diagnostics;
 
 namespace NativeMessagingHostInProcess
 {
@@ -22,6 +27,9 @@ namespace NativeMessagingHostInProcess
     /// </summary>
     sealed partial class App : Application
     {
+
+        private AppServiceConnection appServiceConnection;
+        private BackgroundTaskDeferral appServiceDeferral;
         /// <summary>
         /// 初始化单一实例应用程序对象。这是执行的创作代码的第一行，
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
@@ -31,6 +39,72 @@ namespace NativeMessagingHostInProcess
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }
+
+        /// <summary>
+        /// Initializes the app service on the host process 
+        /// </summary>
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+            IBackgroundTaskInstance taskInstance = args.TaskInstance;
+            AppServiceTriggerDetails appService = taskInstance.TriggerDetails as AppServiceTriggerDetails;
+            appServiceDeferral = taskInstance.GetDeferral();
+            taskInstance.Canceled += OnAppServicesCanceled;
+            appServiceConnection = appService.AppServiceConnection;
+            appServiceConnection.RequestReceived += OnAppServiceRequestReceived;
+            appServiceConnection.ServiceClosed += AppServiceConnection_ServiceClosed;
+        }
+        /// <summary>
+        /// Receives message from Extension (via Edge)
+        /// </summary>
+        private async void OnAppServiceRequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        {
+            AppServiceDeferral messageDeferral = args.GetDeferral();
+            ValueSet message = args.Request.Message;
+
+            string value = args.Request.Message.First().Value.ToString();
+            Debug.WriteLine(value);
+            ValueSet returnMessage = new ValueSet();
+            returnMessage.Add("message", value);
+            await args.Request.SendResponseAsync(returnMessage);
+            //}
+            messageDeferral.Complete();
+        }
+        /// <summary>
+        /// Associate the cancellation handler with the background task 
+        /// </summary>
+        private void OnAppServicesCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
+        {
+            appServiceDeferral.Complete();
+        }
+        /// <summary>
+        /// Occurs when the other endpoint closes the connection to the app service
+        /// </summary>
+        private void AppServiceConnection_ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
+        {
+            appServiceDeferral.Complete();
+        }
+
+        /// <summary>
+        /// Receives message from desktopBridge App
+        /// </summary>
+        //private async void OndesktopBridgeAppServiceRequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        //{
+        //}
+
+        /// <summary>
+        /// Associate the cancellation handler with the background task 
+        /// </summary>
+        //private void OndesktopBridgeAppServicesCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
+        //{
+        //}
+
+        /// <summary>
+        /// Occurs when the other endpoint closes the connection to the app service
+        /// </summary>
+        //private void desktopBridgeAppServiceConnection_ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
+        //{
+        //}
 
         /// <summary>
         /// 在应用程序由最终用户正常启动时进行调用。
