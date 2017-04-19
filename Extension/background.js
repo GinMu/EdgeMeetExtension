@@ -1,6 +1,6 @@
 // Store port for native messaging connections
 var portDict = {};
-var hostName = "meetExtensionHostInProcess";
+var hostName = "nativeMessagingHostInProcess";
 
 // Listen for messages from content script
 browser.runtime.onMessage.addListener(
