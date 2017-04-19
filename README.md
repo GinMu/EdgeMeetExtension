@@ -1,4 +1,4 @@
-# meetExtension On Microsoft Edge
+# native messaging On Microsoft Edge
 
 
 ## Firstly
