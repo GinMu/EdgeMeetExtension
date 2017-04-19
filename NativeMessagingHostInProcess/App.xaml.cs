@@ -18,7 +18,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using System.Diagnostics;
 
 namespace NativeMessagingHostInProcess
 {
@@ -63,11 +62,9 @@ namespace NativeMessagingHostInProcess
             ValueSet message = args.Request.Message;
 
             string value = args.Request.Message.First().Value.ToString();
-            Debug.WriteLine(value);
             ValueSet returnMessage = new ValueSet();
-            returnMessage.Add("message", value);
+            returnMessage.Add("message", "type and value:" + value);
             await args.Request.SendResponseAsync(returnMessage);
-            //}
             messageDeferral.Complete();
         }
         /// <summary>
