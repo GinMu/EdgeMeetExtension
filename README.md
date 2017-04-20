@@ -2,7 +2,7 @@
 
 
 ## Firstly
-* Please upgrade windows 10 to Version 1607
+* Please upgrade windows 10 to Version 1703
 
 > [Download Site](https://www.microsoft.com/zh-cn/software-download/windows10)
 
