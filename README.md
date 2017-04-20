@@ -12,7 +12,7 @@
 
 ## Audio & Video
 * 目前仅仅是extension和UWP之间的通讯，UWP调用其他应用服务需要重写NativeMessageingHostInProcess下App.xaml.cs中的逻辑.
-* 集成audio/video应该需要参考[Adding a Desktop Bridge component](https://docs.microsoft.com/zh-cn/microsoft-edge/extensions/guides/native-messaging#desktop-bridge-component)
+* 集成audio/video应该需要参考[Adding a Desktop Bridge component](https://docs.microsoft.com/zh-cn/microsoft-edge/extensions/guides/native-messaging#desktop-bridge-component) and [Desktop to UWP Bridge](https://docs.microsoft.com/en-us/windows/uwp/porting/desktop-to-uwp-root)
 
 ## Build Steps
 1. build and deploy meetExtensionHostInProcess
